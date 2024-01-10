@@ -14,8 +14,13 @@ log_info() {
 # https://stackoverflow.com/questions/11821378/what-does-bashno-job-control-in-this-shell-mean/46829294#46829294
 set -m
 
-log_info "Import database dump"
-neo4j-admin database load --from-path=/dumps neo4j --overwrite-destination=true
-log_info "DONE. Database imported"
+if [ -f /dumps/neo4j.dump ]; then
+  log_info "Found database dump file"
+  log_info "Import database dump"
+  neo4j-admin database load --from-path=/dumps neo4j --overwrite-destination=true
+  log_info "Database import complete"
+else
+  log_info "No database dump file found. Starting with existing, possibly empty, database"
+fi
 
 /startup/docker-entrypoint.sh neo4j
